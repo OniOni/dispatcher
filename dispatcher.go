@@ -10,6 +10,15 @@ import (
 
 var subscribers map[string][]string;
 
+func contains(haystack []string, needle string) bool {
+	for _, val := range haystack {
+		if val == needle {
+			return true;
+		}
+	}
+	return false;
+}
+
 func push(subscriber, mess string) {
 	fmt.Println(subscriber, mess)
 }
@@ -18,7 +27,10 @@ func subscribe(id, subscriber string) {
 	if subscribers[id] == nil {
 		subscribers[id] = make([]string, 0)
 	}
-	subscribers[id] = append(subscribers[id], subscriber)
+
+	if !contains(subscribers[id], subscriber) {
+		subscribers[id] = append(subscribers[id], subscriber)
+	}
 }
 
 func respond(conn net.Conn) {

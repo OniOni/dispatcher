@@ -6,7 +6,7 @@ import (
 	"net"
 	"strings"
 	"encoding/json"
-	"store"
+	"./store"
 )
 
 var subscribers map[string][]string;
@@ -73,10 +73,13 @@ func respond(conn net.Conn) {
 }
 
 func main() {
+	st, err := store.NewStore()
 
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(st)
 
 	subscribers = make(map[string][]string)
 

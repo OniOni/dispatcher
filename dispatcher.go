@@ -6,9 +6,11 @@ import (
 	"net"
 	"strings"
 	"encoding/json"
+	"github.com/cloudflare/gokabinet/kc"
 )
 
 var subscribers map[string][]string;
+var db kc.DB;
 
 func contains(haystack []string, needle string) bool {
 	for _, val := range haystack {
@@ -72,7 +74,18 @@ func respond(conn net.Conn) {
 }
 
 func main() {
+	db, err := kc.Open("/tmp/cache.kch", kc.WRITE)
+	defer db.Close()
+
+	if err != nil {
+		panic(err)
+	}
+
+	db.SetInt("Test", 42)
 	subscribers = make(map[string][]string)
+
+	int, err := db.GetInt("Test")
+	fmt.Println(int)
 
 	ln, err := net.Listen("tcp", ":8080")
 	if err != nil {

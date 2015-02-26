@@ -22,3 +22,11 @@ func (s Store) Open() error {
 func (s Store) Close(){
 	s.db.Close()
 }
+
+func (s Store) GetSubscribers(key string) (string, error){
+	return s.db.Get(key);
+}
+
+func (s Store) AddSubsriber(key, value string) error{
+	return s.db.Append(key, value);
+}

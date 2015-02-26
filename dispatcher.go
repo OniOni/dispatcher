@@ -73,14 +73,6 @@ func respond(conn net.Conn) {
 }
 
 func main() {
-	st, err := store.NewStore()
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(st)
-
 	subscribers = make(map[string][]string)
 
 	ln, err := net.Listen("tcp", ":8080")

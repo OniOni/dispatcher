@@ -1,6 +1,7 @@
 package store
 
 import (
+	"strings"
 	"github.com/cloudflare/gokabinet/kc"
 )
 
@@ -18,12 +19,26 @@ func (s Store) Close(){
 	s.db.Close()
 }
 
-func (s Store) GetSubscribers(key string) (string, error){
-	return s.db.Get(key);
+func (s Store) GetSubscribers(key string) ([]string, error){
+	str, error := s.db.Get(key);
+	if error != nil {
+		return nil, error
+	}
+
+	return strings.Split(str, ";")[1:], nil
 }
 
 func (s Store) AddSubsriber(key, value string) error{
-	return s.db.Append(key, value);
+	return s.db.Append(key, ";" + value);
+}
+
+func (s Store) IsSubscribed(key, value string) (bool, error){
+	str, error := s.db.Get(key)
+	if  error != nil {
+		return false, error
+	}
+
+	return strings.Contains(str, value), nil
 }
 
 func NewStore() (Store, error) {

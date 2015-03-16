@@ -20,8 +20,9 @@ func (s *Store) Close(){
 	s.db.Close()
 }
 
-//func (s Store) GetKeys() ([]string, error) {
-//}
+func (s *Store) GetKeys() []string {
+	return s.keys
+}
 
 func (s *Store) HasKey(key string) (bool) {
 	for _, str := range s.keys {

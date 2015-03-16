@@ -16,7 +16,11 @@ func push(subscriber, mess string) {
 }
 
 func subscribe(id, subscriber string) {
-	subscribers.AddSubsriber(id, subscriber)
+	err := subscribers.AddSubsriber(id, subscriber)
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
 }
 
 func respond(conn net.Conn) {

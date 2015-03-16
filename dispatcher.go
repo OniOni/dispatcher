@@ -6,32 +6,17 @@ import (
 	"net"
 	"strings"
 	"encoding/json"
-	"./store"
+	"github.com/OniOni/dispatcher/store"
 )
 
-var subscribers map[string][]string;
-
-func contains(haystack []string, needle string) bool {
-	for _, val := range haystack {
-		if val == needle {
-			return true;
-		}
-	}
-	return false;
-}
+var subscribers *store.Store;
 
 func push(subscriber, mess string) {
 	fmt.Println(subscriber, mess)
 }
 
 func subscribe(id, subscriber string) {
-	if subscribers[id] == nil {
-		subscribers[id] = make([]string, 0)
-	}
-
-	if !contains(subscribers[id], subscriber) {
-		subscribers[id] = append(subscribers[id], subscriber)
-	}
+	subscribers.AddSubsriber(id, subscriber)
 }
 
 func respond(conn net.Conn) {
@@ -51,18 +36,21 @@ func respond(conn net.Conn) {
 
 		case "sub":
 			subscribe(parts[2], parts[1])
-			b, _ := json.Marshal(subscribers)
+			subs, _ := subscribers.GetSubscribers(parts[2])
+			b, _ := json.Marshal(subs)
 			conn.Write(b)
 
 		case "msub":
 			for _, val := range parts[2:] {
 				subscribe(val, parts[1])
 			}
-			b, _ := json.Marshal(subscribers)
+			subs, _ := subscribers.GetSubscribers(parts[2])
+			b, _ := json.Marshal(subs)
 			conn.Write(b)
 
 		case "push":
-			for _, val := range subscribers[parts[1]] {
+			subs, _ := subscribers.GetSubscribers(parts[1])
+			for _, val := range subs  {
 				go push(val, parts[2])
 			}
 
@@ -73,7 +61,12 @@ func respond(conn net.Conn) {
 }
 
 func main() {
-	subscribers = make(map[string][]string)
+	var err error;
+	subscribers, err = store.NewStore()
+
+	if err != nil {
+		panic(err)
+	}
 
 	ln, err := net.Listen("tcp", ":8080")
 	if err != nil {

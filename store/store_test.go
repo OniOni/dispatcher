@@ -45,3 +45,21 @@ func Test_IsSubscribed(t *testing.T) {
 		t.Error("Should be subscirbed.")
 	}
 }
+
+func Test_hasKey(t *testing.T) {
+	store, error := NewStore()
+	if error != nil {
+		t.Error("Error creating store.")
+	}
+	defer store.Close()
+	store.db.Clear()
+
+	store.AddSubsriber("key", "one")
+	if error != nil {
+		t.Error("Error setting value.")
+	}
+
+	if !store.HasKey("key") {
+		t.Error("Should have contained key.")
+	}
+}

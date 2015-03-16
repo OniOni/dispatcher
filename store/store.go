@@ -2,6 +2,7 @@ package store
 
 import (
 	"strings"
+	"errors"
 	"github.com/cloudflare/gokabinet/kc"
 )
 
@@ -44,11 +45,14 @@ func (s *Store) GetSubscribers(key string) ([]string, error){
 }
 
 func (s *Store) AddSubsriber(key, value string) error{
-	if !s.HasKey(key) {
-		s.keys = append(s.keys, key)
+	subscribed, _ := s.IsSubscribed(key, value)
+
+	if subscribed {
+		return errors.New("Already subscribed")
 	}
 
-	return s.db.Append(key, ";" + value);
+	s.keys = append(s.keys, key)
+	return s.db.Append(key, ";" + value)
 }
 
 func (s *Store) IsSubscribed(key, value string) (bool, error){
